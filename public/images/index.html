@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Coming Soon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #0b0e1a;
+      --fg: #f2f4ff;
+      --muted: #9aa0b4;
+      --accent: #7c8cff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1b1f3f, var(--bg));
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .wrapper {
+      text-align: center;
+      max-width: 520px;
+      padding: 2.5rem;
+      animation: fadeUp 0.9s ease;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 3.5rem);
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      padding: 1rem;
+      min-width: 80px;
+      backdrop-filter: blur(6px);
+    }
+
+    .box span {
+      display: block;
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+
+    .box small {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .datetime {
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      font-size: 1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 10px 28px rgba(124, 140, 255, 0.35);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 36px rgba(124, 140, 255, 0.45);
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      opacity: 0.8;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <h1>We’re Launching Soon</h1>
+    <p>
+      Something focused, fast, and carefully engineered is on the way.
+      We’re polishing the last few details.
+    </p>
+
+    <div class="countdown">
+      <div class="box">
+        <span id="days">00</span>
+        <small>DAYS</small>
+      </div>
+      <div class="box">
+        <span id="hours">00</span>
+        <small>HOURS</small>
+      </div>
+      <div class="box">
+        <span id="minutes">00</span>
+        <small>MIN</small>
+      </div>
+      <div class="box">
+        <span id="seconds">00</span>
+        <small>SEC</small>
+      </div>
+    </div>
+
+    <!-- Live DateTime -->
+    <div class="datetime" id="datetime"></div>
+
+    <button onclick="notify()">Notify Me</button>
+
+    <footer>
+      © <span id="year"></span> — Built with intention
+    </footer>
+  </div>
+
+  <script>
+    const launchDate = new Date("2026-03-01T00:00:00").getTime();
+    const $ = id => document.getElementById(id);
+
+    function updateCountdown() {
+      const now = Date.now();
+      const diff = launchDate - now;
+      if (diff <= 0) return;
+
+      $("days").textContent = String(Math.floor(diff / 86400000)).padStart(2, "0");
+      $("hours").textContent = String(Math.floor(diff / 3600000) % 24).padStart(2, "0");
+      $("minutes").textContent = String(Math.floor(diff / 60000) % 60).padStart(2, "0");
+      $("seconds").textContent = String(Math.floor(diff / 1000) % 60).padStart(2, "0");
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Kolkata",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23"
+      }).formatToParts(now);
+
+      const get = t => parts.find(p => p.type === t).value;
+
+      $("datetime").textContent =
+        `${get("day")}-${get("month")}-${get("year")} ` +
+        `${get("hour")}:${get("minute")}:${get("second")} IST`;
+    }
+
+    function notify() {
+      alert("Notifications aren’t wired yet — but you’re officially early 👀");
+    }
+
+    setInterval(updateCountdown, 1000);
+    setInterval(updateDateTime, 1000);
+
+    updateCountdown();
+    updateDateTime();
+
+    $("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
