@@ -22,8 +22,7 @@
 
     body {
       min-height: 100vh;
-      background:
-        radial-gradient(circle at top, #1b1f3f, var(--bg));
+      background: radial-gradient(circle at top, #1b1f3f, var(--bg));
       color: var(--fg);
       display: flex;
       align-items: center;
@@ -54,7 +53,7 @@
       display: flex;
       justify-content: center;
       gap: 1rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
     }
 
     .box {
@@ -75,6 +74,13 @@
       font-size: 0.75rem;
       color: var(--muted);
       letter-spacing: 0.05em;
+    }
+
+    .datetime {
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
     }
 
     button {
@@ -141,6 +147,9 @@
       </div>
     </div>
 
+    <!-- Live DateTime -->
+    <div class="datetime" id="datetime"></div>
+
     <button onclick="notify()">Notify Me</button>
 
     <footer>
@@ -149,26 +158,38 @@
   </div>
 
   <script>
-    // Set your launch date here
     const launchDate = new Date("2026-03-01T00:00:00").getTime();
-
     const $ = id => document.getElementById(id);
 
     function updateCountdown() {
       const now = Date.now();
       const diff = launchDate - now;
-
       if (diff <= 0) return;
 
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const m = Math.floor((diff / (1000 * 60)) % 60);
-      const s = Math.floor((diff / 1000) % 60);
+      $("days").textContent = String(Math.floor(diff / 86400000)).padStart(2, "0");
+      $("hours").textContent = String(Math.floor(diff / 3600000) % 24).padStart(2, "0");
+      $("minutes").textContent = String(Math.floor(diff / 60000) % 60).padStart(2, "0");
+      $("seconds").textContent = String(Math.floor(diff / 1000) % 60).padStart(2, "0");
+    }
 
-      $("days").textContent = String(d).padStart(2, "0");
-      $("hours").textContent = String(h).padStart(2, "0");
-      $("minutes").textContent = String(m).padStart(2, "0");
-      $("seconds").textContent = String(s).padStart(2, "0");
+    function updateDateTime() {
+      const now = new Date();
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Kolkata",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23"
+      }).formatToParts(now);
+
+      const get = t => parts.find(p => p.type === t).value;
+
+      $("datetime").textContent =
+        `${get("day")}-${get("month")}-${get("year")} ` +
+        `${get("hour")}:${get("minute")}:${get("second")} IST`;
     }
 
     function notify() {
@@ -176,7 +197,10 @@
     }
 
     setInterval(updateCountdown, 1000);
+    setInterval(updateDateTime, 1000);
+
     updateCountdown();
+    updateDateTime();
 
     $("year").textContent = new Date().getFullYear();
   </script>
